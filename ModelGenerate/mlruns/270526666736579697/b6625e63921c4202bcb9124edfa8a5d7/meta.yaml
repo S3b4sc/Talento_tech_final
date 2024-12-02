@@ -1,0 +1,15 @@
+artifact_uri: file:///home/sebastian/Desktop/For_studyng/TalentoTech/FinalProject/Talento_tech_final/ModelGenerate/mlruns/270526666736579697/b6625e63921c4202bcb9124edfa8a5d7/artifacts
+end_time: 1733175118313
+entry_point_name: ''
+experiment_id: '270526666736579697'
+lifecycle_stage: active
+run_id: b6625e63921c4202bcb9124edfa8a5d7
+run_name: Run_4
+run_uuid: b6625e63921c4202bcb9124edfa8a5d7
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1733175112833
+status: 3
+tags: []
+user_id: sebastian
