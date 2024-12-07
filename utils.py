@@ -32,3 +32,10 @@ departments_coordinates = {
     'Vaupes': {'latitude': 1.1, 'longitude': -70.2},
     'Vichada': {'latitude': 5.0, 'longitude': -69.8}
 }
+
+
+forAllUtils = {
+    'dataPath': './data/raw/AllDepartments/'
+}
+
+
