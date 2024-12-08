@@ -98,6 +98,13 @@ def loadDensityPlot(path:str):
     
     return data
 
+
 def AllDfFinalLoad(*,path:str):
     df_final = pd.read_parquet(path, engine='pyarrow')
     return df_final
+
+
+# Función para cargar historial de red neurona y hacer plot de aprendizaje 
+def NN_run7History(*,path:str):
+    history = pd.read_csv(path)
+    return history

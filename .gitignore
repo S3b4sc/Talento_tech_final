@@ -6,6 +6,8 @@ ModelGenerate/mlruns
 __pycache__/
 *.py[cod]
 *$py.class
+managed_context/
+test_suite_analysis/
 
 # C extensions
 *.so

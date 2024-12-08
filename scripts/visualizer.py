@@ -94,3 +94,48 @@ def rf_hourlyDist(*,data:pd.DataFrame):
     # Mostrar la gráfica
     plt.tight_layout()  # Ajustar la figura para evitar recortes
     return fig
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+# Función para hacer plot de la producción de potencia diaria
+
+def dailyPower(*,data:pd.DataFrame) -> plt.figure:
+    fig = plt.figure(figsize=(13,7))
+
+    data['P'].plot()
+    plt.ylabel('Power (W)')
+    plt.title('Generated power in time')
+    return fig
+    
+    
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+# Función para graficar aprendizaje de la red neuronal.
+
+def NN_learningPlot(*,history:pd.DataFrame) -> plt.figure:
+    
+     # Crear la figura y los subgráficos
+    fig, axes = plt.subplots(1, 2, figsize=(15, 6))
+
+    # Gráfico 1: Loss
+    axes[0].plot(history['loss'], label='Pérdida de entrenamiento')
+    axes[0].plot(history['val_loss'], label='Pérdida de validación')
+    axes[0].set_xlabel('Épocas')
+    axes[0].set_ylabel('Pérdida')
+    axes[0].legend()
+    axes[0].set_title('Curvas de aprendizaje - Pérdida')
+
+
+    # Gráfico 2: métrica MAE
+    axes[1].plot(history['mean_squared_error'], label='RMSE de entrenamiento')
+    axes[1].plot(history['val_loss'], label='RMSE de validación')
+    axes[1].set_xlabel('Épocas')
+    axes[1].set_ylabel('MAE')
+    axes[1].legend()
+    axes[1].set_title('Curvas de aprendizaje - RMSE')
+    
+    plt.suptitle('\n Curvas de aprensizaje', fontsize=14)
+    # Ajustar diseño
+    plt.tight_layout()
+    return fig
+    
