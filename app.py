@@ -1,4 +1,6 @@
 import streamlit as st
+import pandas as pd
+import numpy as np
 from scripts.data_loader import loadForAll, loadNNForestData, loadDensityPlot,AllDfFinalLoad, NN_run7History
 from scripts.data_cleaner import Allformat, AllAnnotations,densityDataProcess,rf_cleanTransform,rf_hourlyDis_process
 from utils import forAllUtils
@@ -75,7 +77,7 @@ elif section == "Random Forest - Neural Network":
     
     st.write('Para los gráficos de Random Forest')
     if st.button('Start'):
-        rawData = loadNNForestData(path='./data/raw/Timeseries_11.573_-72.814_E5_3kWp_crystSi_16_v45deg_2005_2023.csv',n=10,m=13)
+        #rawData = loadNNForestData(path='./data/raw/Timeseries_11.573_-72.814_E5_3kWp_crystSi_16_v45deg_2005_2023.csv',n=10,m=13)
 
         y_test, predictions, indices, feature_importances, features = rf_cleanTransform(path='./data/processed/rf_test_data.csv')
         fig = rf_plots(y_test, predictions, indices, feature_importances, features)
@@ -100,4 +102,33 @@ elif section == "Random Forest - Neural Network":
         fig = NN_learningPlot(history=history)
         st.pyplot(fig)
     
-    
+    if st.button('pred vs real'):
+        data = pd.read_csv('./data/processed/NN_pred.csv').sample(100)
+        # Mostrar el DataFrame con scroll
+        st.dataframe(data, height=300)
+
+
+    # Formulario para predcción con red neuronal
+    model = joblib.load('./models/NNModel')
+    scaler = joblib.load('./models/NN_scaler.pkl')
+    # Crear un formulario
+    with st.form("prediction_form"):
+        st.write("Ingrese los valores de las variables:")
+        # Supongamos que tu modelo necesita 3 características de entrada
+        var1 = st.number_input("Gb", min_value=0.0, max_value=1000.0, value=0.0)
+        var2 = st.number_input("Gd", min_value=0.0, max_value=1000.0, value=0.0)
+        var3 = st.number_input("Gr", min_value=0.0, max_value=1000.0, value=0.0)
+        var4 = st.number_input("T", min_value=0.0, max_value=1000.0, value=0.0)
+        var5 = st.number_input("W", min_value=0.0, max_value=1000.0, value=0.0)
+        # Botón para enviar el formulario
+        submitted = st.form_submit_button("Predecir")
+    # Procesar el formulario cuando se envía
+    if submitted:
+        # Crear un array con los datos ingresados
+        input_data = np.array([[var1, var2, var3, var4, var5]]).reshape(1,-1)
+        # Escalamos la entrada
+        scaled_input_data = scaler.transform(input_data)
+        # Hacer la predicción
+        prediction = model.predict(scaled_input_data)
+        # Mostrar el resultado
+        st.write("El resultado de la predicción es:", prediction[0][0])
