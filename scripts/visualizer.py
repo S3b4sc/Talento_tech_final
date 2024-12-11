@@ -25,9 +25,9 @@ def plot_map(*,annot:dict):
         annotation = f'{dept}\n' + annot[dept] 
 
         if 'Not' in annot[dept]:
-            ax.text(lon + 0.1, lat, annotation, fontsize=6, color='blue')  # Texto cerca del punto
+            ax.text(lon + 0.1, lat, annotation, fontsize=7, color='blue')  # Texto cerca del punto
         else:
-            ax.text(lon + 0.1, lat, annotation, fontsize=6, color='green')  # Texto cerca del punto
+            ax.text(lon + 0.1, lat, annotation, fontsize=7, color='green')  # Texto cerca del punto
 
     # Personalizar el plot
     ax.set_title('Mapa de Colombia con Anotaciones', fontsize=16)
