@@ -69,6 +69,8 @@ if section == "Inicio":
     st.markdown("""
         ¡Bienvenido a este dashboard interactivo! Explora los análisis realizados que buscan entender acerca de 
         la implementación energías renovables en Colombia: energía fotovoltaica y mareomotriz
+        \nPara mayor información, visite el código fuente en el repositorio: https://github.com/S3b4sc/Talento_tech_final
+        y la siguiente carpeta, donde puede encontrar documentación detallada: https://drive.google.com/drive/folders/1EiifWvappJ7txvkK2fLHLn6um7SoOy7c?usp=sharing 
     """)
     
     with st.expander("Ver funcionalidades principales"):
@@ -295,11 +297,16 @@ elif section == "Paneles solares: Modelos Predictivos":
             st.write("Ingrese los valores de las variables:")
             col1, col2 = st.columns(2)
             with col1:
-                var1 = st.number_input("Gb", min_value=0.0, max_value=1000.0, value=0.0)
-                var2 = st.number_input("Gd", min_value=0.0, max_value=1000.0, value=0.0)
-                var3 = st.number_input("Gr", min_value=0.0, max_value=1000.0, value=0.0)
-                var4 = st.number_input("T", min_value=10.0, max_value=1000.0, value=25.5)
-                var5 = st.number_input("W", min_value=2.0, max_value=1000.0, value=3.7)
+                var1 = st.number_input("Gb(i) [W/m²]", min_value=0.0, max_value=1000.0, value=0.0)
+                st.caption("Gb(i):  Beam (direct) irradiance on the inclined plane (plane of the array) [W/m²]")
+                var2 = st.number_input("Gd(i) [W/m²]", min_value=0.0, max_value=1000.0, value=0.0)
+                st.caption("Gd(i):  Diffuse irradiance on the inclined plane (plane of the array) [W/m²]")
+                var3 = st.number_input("Gr(i) [W/m²]", min_value=0.0, max_value=1000.0, value=0.0)
+                st.caption("Gr(i):  Reflected irradiance on the inclined plane (plane of the array) [W/m²]")
+                var4 = st.number_input("T [°C]", min_value=10.0, max_value=1000.0, value=25.5)
+                st.caption("T:  Air temperature (degree Celsius) [°C]")
+                var5 = st.number_input("W [m/s]", min_value=2.0, max_value=1000.0, value=3.7)
+                st.caption("W:  Total wind speed [m/s]")
                 submitted = st.form_submit_button("Predecir")
 
         if submitted:
@@ -307,7 +314,7 @@ elif section == "Paneles solares: Modelos Predictivos":
                 input_data = np.array([var1, var2, var3, var4, var5]).reshape(1, -1)
                 scaled_input_data = scaler.transform(input_data)
                 prediction = model.predict(scaled_input_data)
-                st.success(f"El resultado de la predicción es: {prediction[0][0]}")
+                st.success(f"En una hora se espera producir: {np.round(prediction[0][0],0)} Watts")
             except Exception as e:
                 st.error(f"Error en la predicción: {e}")
 
@@ -316,47 +323,52 @@ elif section == "Paneles solares: Modelos Predictivos":
 elif section == "Resultados":
     st.header("🖼️ Sección de Imágenes")
     st.markdown("""
-    En esta sección, podrás ver algunas imágenes relacionadas con el análisis y las predicciones.
+    En esta sección, podrás ver algunas imágenes relacionadas con el análisis y las predicciones tanto para los paneles soalres como para
+    la energía mareomotriz.
     """)
 
     st.subheader("1. Imágenes de Análisis")
-    st.markdown("""
-    Resultados de predicción de potencia basado en red neuronal.
-    """)
-
-    st.image('./images/compare_real_predict.png', use_container_width=True)
-
-    st.markdown("""
-    Distribución de producción diaria histórica en la guajira.
-    """)
-    rfhourlydata = loadNNForestData(path='./data/raw/Timeseries_11.573_-72.814_E5_3kWp_crystSi_16_v45deg_2005_2023.csv',
-                                    n=10,
-                                    m=13)
-    rfhourlydist = rf_hourlyDis_process(data=rfhourlydata)
-    fig1 = rf_hourlyDist(data=rfhourlydist)
-    st.pyplot(fig1)
-    st.markdown("""
-    Potencia diaría generada en la Guajira desde 2005 para 10 paneles solares..
-    """)
-    fig2 = dailyPower(data=rfhourlydist)
-    st.pyplot(fig2)
     
-    st.markdown("""
+    with st.expander("Galería: Producción de potencia de paneles solares en la Guajira"):
+        col1, col2 = st.columns(2)
+        with col1:
+            st.image('./images/compare_real_predict.png', caption=f"Resultados de predicción de potencia  en páneles solares basado en red neuronal.", use_container_width=True)
+            st.image('./images/normal_dist_power.png', caption="Distribución de producción de potencia de paneles solares.",use_container_width=False)
+        with col2:
+            #st.image('./images/compare_real_predict.png', caption=f"Distribución de producción diaria histórica en la guajira.", use_container_width=True)
+    
+            rfhourlydata = loadNNForestData(path='./data/raw/Timeseries_11.573_-72.814_E5_3kWp_crystSi_16_v45deg_2005_2023.csv',
+                                            n=10,
+                                            m=13)
+            rfhourlydist = rf_hourlyDis_process(data=rfhourlydata)
+            fig1 = rf_hourlyDist(data=rfhourlydist)
+            st.pyplot(fig1)
+            st.markdown("Distribución de producción diaria histórica en la guajira.")
+            fig2 = dailyPower(data=rfhourlydist)
+            st.pyplot(fig2)
+            
+            st.markdown("""
+            Potencia diaría generada en la Guajira desde 2005 para 10 paneles solares..
+            """)
+    
+    with st.expander("Galería: entrenamiento de red LSTM para paneles solares"):
+        col3,col4 = st.columns(2)
+        st.markdown("""
     Convergencia del modelo de red neuronal Long Short Term Memory (LSTM) para los páneles solares
     """)
+        with col3:
+            st.image('./images/Loss_plot_effi.png', use_container_width=False)
+        with col4:
+            st.image('./images/Loss_plot_power.png', use_container_width=False)
 
-    st.image('./images/Loss_plot_effi.png', use_container_width=False)
-
-    st.image('./images/Loss_plot_power.png', use_container_width=False)
     
-    st.markdown("""
-    Distribución de potencia de los páneles solares.
-    """)
-
-    st.image('./images/normal_dist_power.png', use_container_width=False)
-
-    st.markdown("""
-    Predición de red neuronal recurrente Long Short Term Memory para la potencia, resultados reales vs predicción. para
-    la producción de energía mareomotriz en un area de 50km cuadrados.
-    """)
-    st.image('./images/Tidal_energy.png', use_container_width=False)
+    with st.expander("Galería: Potencia mareomotriz"):
+        
+        col5,col6 = st.columns(2)
+        with col5:
+            st.image('./images/Tidal_energy.png',caption="Predición de red neuronal recurrente Long Short Term Memory para la potencia, resultados reales vs predicción. parala producción de energía mareomotriz en un area de 50km².", use_container_width=False)    
+            st.image('./images/aprendizajemareo.png',caption="APrendizaje de red neuronal LSTM para energía mareomotriz")
+            st.image('./images/residuals.png',caption="Dispersión de residuales vs predicciones con LSTM para la energía mareomotriz", use_container_width=False)    
+        with col6:
+            st.image('./images/potenciamareo.png',caption="Histórico de potencia producida en la guajira para energía mareomotriz en 50km²")
+            st.image('./images/powerr.png',caption="Distirbución histórica de potencia producida en la guajira para energía mareomotriz en 50km²")                        
