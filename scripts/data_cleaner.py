@@ -50,6 +50,27 @@ def Allformat(*,dataframes:dict):
 
     return dayDepartments
 
+
+def Oneformat(*,data:dict):
+    """
+    Processes a dictionary of DataFrames by correcting the 'time' column format and 
+    grouping each DataFrame by day using the 'toDay' function.
+
+    Args:
+        dataframes (dict): Dictionary where keys are department names and values are DataFrames.
+
+    Returns:
+        dict: Dictionary with grouped DataFrames (daily averages) for each department.
+    """
+    # Agrupamos el dataframe por días
+    dayPlace = {}
+    # Corregimos el formato
+    data['time'] = pd.to_datetime(data['time'], format='%Y%m%d:%H%M')
+    # Agrupamos por días
+    dayPlace['place'] = toDay(data)
+
+    return dayPlace
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 def predProb(data: pd.DataFrame) -> pd.DataFrame:
@@ -92,7 +113,7 @@ def predProb(data: pd.DataFrame) -> pd.DataFrame:
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-def viability(data: pd.DataFrame) -> pd.DataFrame:
+def viability(data: pd.DataFrame,one:bool = False) -> pd.DataFrame:
     """
     Calculates a global viability score based on normalized production probabilities and 
     determines whether the production is viable or not.
@@ -116,6 +137,7 @@ def viability(data: pd.DataFrame) -> pd.DataFrame:
     meanProbNormal = data['Prob_normal'].mean()
     meanProbLow = data['Prob_low'].mean()
     
+    
     if (meanProbHigh + meanProbNormal >= 2* meanProbLow):
         viability = 'Viable'
     else:
@@ -123,12 +145,15 @@ def viability(data: pd.DataFrame) -> pd.DataFrame:
         
     # Normalizar probabilidades promedio
     
-    annotation = f""" 
-    daily high prob: {np.round(meanProbHigh,3)}
-    daily normal prob: {np.round(meanProbNormal,3)}
-    daily low prob: {np.round(meanProbLow,3)}
-            {viability}
-    """
+    if one:
+        annotation = f""" 
+        daily high prob: {np.round(meanProbHigh,3)}\n
+        daily normal prob: {np.round(meanProbNormal,3)}\n
+        daily low prob: {np.round(meanProbLow,3)}\n
+                {viability}
+        """
+    else:
+        annotation = f"{viability}"
 
     return annotation
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -153,6 +178,27 @@ def AllAnnotations(*,dayDepartments:dict):
         annot[department] = viability(dayDepartments[department])
     
     joblib.dump(annot,'./data/processed/annotDict.joblib')
+    
+    return annot
+
+def OneAnnotations(*,dayPlace:dict):
+    """
+    Processes a dictionary of DataFrames by predicting probabilities and calculating viability annotations for the desired place.
+
+    Args:
+        dayDepartments (dict): Dictionary where keys is simple one place and values are daily-aggregated DataFrames.
+
+    Returns:
+        dict: Dictionary with viability annotations for each department.
+    """
+    
+    annot = {}
+
+    for place in dayPlace.keys():
+        # Predecimos el score 
+        dayPlace[place] = predProb(dayPlace[place])
+        # Calculamos las anotaciones a mostrar en el gráfico
+        annot[place] = viability(data=dayPlace[place],one=True)
     
     return annot
   
@@ -226,7 +272,7 @@ def rf_hourlyDis_process(*,data:pd.DataFrame):
     data['time'] = pd.to_datetime(data['time'], format='%Y%m%d:%H%M')
     data['hour'] = data['time'].dt.hour
     mean = data['P'].mean()
-    std = data['P'].std()
+    #std = data['P'].std()
     
     def target(power):
         if power < (mean - mean/2):

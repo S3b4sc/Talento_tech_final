@@ -35,6 +35,8 @@ def plot_map(*,annot:dict):
     ax.set_ylabel('Latitud')
     plt.grid(visible=True, linestyle='--', alpha=0.6)
     
+    plt.savefig('./images/maparegional.png')
+    
     return fig
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

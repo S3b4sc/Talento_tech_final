@@ -60,6 +60,7 @@ def loadForAll(*,path:str,n:int,m:int) -> pd.DataFrame:
     
     return dataframes
 
+
 def loadDensityPlot(path:str):
     #Lista para almacenar los DataFrames
     dataframes = []
