@@ -16,11 +16,11 @@ st.set_page_config(
 )
 
 # Estilo personalizado
-st.markdown(
-    """
+st.markdown("""
     <style>
     body {
         background-color: #f7f9fc;
+        font-family: 'Arial', sans-serif;
     }
     .main-header {
         font-size: 2rem;
@@ -28,27 +28,36 @@ st.markdown(
         font-weight: bold;
         margin-bottom: 1rem;
     }
+    .sub-header {
+        color: #2980B9;
+        margin-bottom: 0.5rem;
+    }
     .divider {
         border-top: 2px solid #BDC3C7;
         margin: 2rem 0;
     }
-    .compact-form .stNumberInput {
-        max-width: 200px;
-        margin-right: 15px;
+    .stButton>button {
+        background-color: #3498db;
+        color: white;
+        font-weight: bold;
+        border-radius: 5px;
+    }
+    .stButton>button:hover {
+        background-color: #2980b9;
     }
     </style>
-    """,
-    unsafe_allow_html=True,
-)
+    """, unsafe_allow_html=True)
+
 
 # Título de la app
 st.markdown('<div class="main-header">Dashboard de Análisis y Predicción</div>', unsafe_allow_html=True)
 
+
 # Sidebar
 st.sidebar.header("📂 Navegación")
-section = st.sidebar.radio(
+section = st.sidebar.selectbox(
     "Selecciona una sección:",
-    ["Inicio", "Datos por Departamentos", "Modelos Predictivos"],
+    ["Inicio", "Datos por Departamentos", "Modelos Predictivos", "Imagenes"],
     index=0,
     help="Navega entre las diferentes funcionalidades de la aplicación."
 )
@@ -57,16 +66,16 @@ section = st.sidebar.radio(
 
 if section == "Inicio":
     st.header("🏠 Bienvenido")
-    st.markdown(
-        """
+    st.markdown("""
         ¡Bienvenido a este dashboard interactivo! Explora análisis de datos, visualizaciones avanzadas y predicciones.
-        
+    """)
+    
+    with st.expander("Ver funcionalidades principales"):
+        st.markdown("""
         ### Funcionalidades principales
         - **Análisis por Departamentos**: Gráficos y mapas interactivos.
         - **Modelos Predictivos**: Visualizaciones y predicciones basadas en Random Forest, Redes Neuronales y LSTM.
-        """
-    )
-    st.image("./assets/intro_image.png", caption="Explora tus datos de forma interactiva.")
+        """)
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -134,90 +143,94 @@ elif section == "Datos por Departamentos":
 
 elif section == "Modelos Predictivos":
     st.header("🧠 Modelos Predictivos")
+    
+    # Usar tabs para dividir el contenido
+    tab1, tab2, tab3 = st.tabs(["Random Forest", "Red Neuronal", "Predicciones"])
 
-    st.subheader("1. Random Forest")
-    st.markdown("Visualiza y analiza resultados del modelo Random Forest.")
-    col1, col2 = st.columns(2)
+    with tab1:
+        st.subheader("1. Random Forest")
+        with st.spinner("Generando gráficos de Random Forest..."):
+            if st.button('🌲 Gráficos Random Forest'):
+                try:
+                    y_test, predictions, indices, feature_importances, features = rf_cleanTransform(path='./data/processed/rf_test_data.csv')
+                    fig = rf_plots(y_test, predictions, indices, feature_importances, features)
+                    st.session_state["rf_fig"] = fig
+                    st.success("¡Gráficos de Random Forest generados exitosamente!")
+                except Exception as e:
+                    st.error(f"Error al generar gráficos: {e}")
 
-    with col1:
-        if st.button('🌲 Gráficos Random Forest'):
+            if "rf_fig" in st.session_state:
+                st.pyplot(st.session_state["rf_fig"])
+
+        st.markdown("""
+    A continuación se muestran algunas imágenes de la precisión del modelo junto con la ROC.
+    """)
+
+    st.image('./images/model_preci.png', caption="Imagen 1: Descripción de la imagen 1", use_container_width=True)
+
+    st.image('./images/ROC_plot.png', caption="Imagen 2: Descripción de la imagen 2", use_container_width=True)
+        
+    with tab2:
+        st.subheader("2. Red Neuronal")
+        with st.spinner("Generando gráfico de aprendizaje..."):
+            if st.button('📉 Gráficos de Aprendizaje'):
+                try:
+                    history = NN_run7History(path='./data/processed/history_DenseNN_run7.csv')
+                    fig = NN_learningPlot(history=history)
+                    st.session_state["learning_fig"] = fig
+                    st.success("¡Gráfico de aprendizaje generado exitosamente!")
+                except Exception as e:
+                    st.error(f"Error al generar gráfico de aprendizaje: {e}")
+
+            if "learning_fig" in st.session_state:
+                st.pyplot(st.session_state["learning_fig"])
+
+    with tab3:
+        st.subheader("3. Predicciones con Red Neuronal")
+        model = joblib.load('./models/NNModel')
+        scaler = joblib.load('./models/NN_scaler.pkl')
+
+        with st.form("prediction_form"):
+            st.write("Ingrese los valores de las variables:")
+            col1, col2 = st.columns(2)
+            with col1:
+                var1 = st.number_input("Gb", min_value=0.0, max_value=1000.0, value=0.0)
+                var2 = st.number_input("Gd", min_value=0.0, max_value=1000.0, value=0.0)
+                var3 = st.number_input("Gr", min_value=0.0, max_value=1000.0, value=0.0)
+                var4 = st.number_input("T", min_value=0.0, max_value=1000.0, value=0.0)
+                var5 = st.number_input("W", min_value=0.0, max_value=1000.0, value=0.0)
+                submitted = st.form_submit_button("Predecir")
+
+        if submitted:
             try:
-                y_test, predictions, indices, feature_importances, features = rf_cleanTransform(path='./data/processed/rf_test_data.csv')
-                fig = rf_plots(y_test, predictions, indices, feature_importances, features)
-                st.session_state["rf_fig"] = fig
-                st.success("¡Gráficos de Random Forest generados exitosamente!")
+                input_data = np.array([[var1, var2, var3, var4, var5]]).reshape(1, -1)
+                scaled_input_data = scaler.transform(input_data)
+                prediction = model.predict(scaled_input_data)
+                st.success(f"El resultado de la predicción es: {prediction[0][0]}")
             except Exception as e:
-                st.error(f"Error al generar gráficos: {e}")
+                st.error(f"Error en la predicción: {e}")
 
-    with col2:
-        if st.button('⏱️ Distribución Horaria'):
-            try:
-                rawData = loadNNForestData(path='./data/raw/Timeseries_11.573_-72.814_E5_3kWp_crystSi_16_v45deg_2005_2023.csv', n=10, m=13)
-                data = rf_hourlyDis_process(data=rawData)
-                fig = rf_hourlyDist(data=data)
-                st.session_state["hourly_fig"] = fig
-                st.success("¡Distribución horaria generada exitosamente!")
-            except Exception as e:
-                st.error(f"Error al generar distribución horaria: {e}")
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-    if "rf_fig" in st.session_state:
-        st.pyplot(st.session_state["rf_fig"])
-    if "hourly_fig" in st.session_state:
-        st.pyplot(st.session_state["hourly_fig"])
+elif section == "Imagenes":
+    st.header("🖼️ Sección de Imágenes")
+    st.markdown("""
+    En esta sección, podrás ver algunas imágenes relacionadas con el análisis y las predicciones.
+    """)
 
-    st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
+    st.subheader("1. Imágenes de Análisis")
+    st.markdown("""
+    A continuación se muestran algunas imágenes relacionadas con los resultados del análisis.
+    """)
 
-    st.subheader("2. Red Neuronal")
-    st.markdown("Visualiza el aprendizaje y realiza predicciones con una red neuronal.")
-    col1, col2 = st.columns(2)
+    st.image('./images/compare_real_predict.png', caption="Imagen 1: Descripción de la imagen 1", use_container_width=True)
 
-    with col1:
-        if st.button('⚡ Producción Diaria de Potencia'):
-            try:
-                rawData = loadNNForestData(path='./data/raw/Timeseries_11.573_-72.814_E5_3kWp_crystSi_16_v45deg_2005_2023.csv', n=10, m=13)
-                fig = dailyPower(data=rawData)
-                st.session_state["daily_power_fig"] = fig
-                st.success("¡Gráfico de potencia diaria generado exitosamente!")
-            except Exception as e:
-                st.error(f"Error al generar gráfico de potencia: {e}")
+    st.image('./images/efficiency_panel.png', caption="Imagen 2: Descripción de la imagen 2", use_container_width=True)
 
-    with col2:
-        if st.button('📉 Gráficos de Aprendizaje'):
-            try:
-                history = NN_run7History(path='./data/processed/history_DenseNN_run7.csv')
-                fig = NN_learningPlot(history=history)
-                st.session_state["learning_fig"] = fig
-                st.success("¡Gráfico de aprendizaje generado exitosamente!")
-            except Exception as e:
-                st.error(f"Error al generar gráfico de aprendizaje: {e}")
+    st.image('./images/Loss_plot_effi.png', caption="Imagen 1: Descripción de la imagen 1", use_container_width=True)
 
-    if "daily_power_fig" in st.session_state:
-        st.pyplot(st.session_state["daily_power_fig"])
-    if "learning_fig" in st.session_state:
-        st.pyplot(st.session_state["learning_fig"])
+    st.image('./images/Loss_plot_power.png', caption="Imagen 2: Descripción de la imagen 2", use_container_width=True)
 
-    st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
+    st.image('./images/normal_dist_power.png', caption="Imagen 1: Descripción de la imagen 1", use_container_width=True)
 
-    st.subheader("3. Predicciones con Red Neuronal")
-    model = joblib.load('./models/NNModel')
-    scaler = joblib.load('./models/NN_scaler.pkl')
-
-    with st.form("prediction_form"):
-        st.write("Ingrese los valores de las variables:")
-        col1, col2 = st.columns(2)
-        with col1:
-            var1 = st.number_input("Gb", min_value=0.0, max_value=1000.0, value=0.0, key='Gb', format='%f')
-            var2 = st.number_input("Gd", min_value=0.0, max_value=1000.0, value=0.0, key='Gd', format='%f')
-            var3 = st.number_input("Gr", min_value=0.0, max_value=1000.0, value=0.0, key='Gr', format='%f')
-            var4 = st.number_input("T", min_value=0.0, max_value=1000.0, value=0.0)
-            var5 = st.number_input("W", min_value=0.0, max_value=1000.0, value=0.0)
-            submitted = st.form_submit_button("Predecir")
-
-    if submitted:
-        try:
-            input_data = np.array([[var1, var2, var3, var4, var5]]).reshape(1, -1)
-            scaled_input_data = scaler.transform(input_data)
-            prediction = model.predict(scaled_input_data)
-            st.success(f"El resultado de la predicción es: {prediction[0][0]}")
-        except Exception as e:
-            st.error(f"Error en la predicción: {e}")
+    st.image('./images/Tidal_energy.png', caption="Imagen 2: Descripción de la imagen 2", use_container_width=True)
