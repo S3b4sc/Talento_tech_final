@@ -68,7 +68,7 @@ if section == "Inicio":
     st.header("🏠 Bienvenido")
     st.markdown("""
         ¡Bienvenido a este dashboard interactivo! Explora los análisis realizados que buscan entender acerca de 
-        la implementación energías renovables en Colombia: energía fotovoltaica y mareomotriz
+        la implementación de energías renovables en Colombia: energía fotovoltaica y mareomotriz
         \nPara mayor información, visite el código fuente en el repositorio: https://github.com/S3b4sc/Talento_tech_final
         y la siguiente carpeta, donde puede encontrar documentación detallada: https://drive.google.com/drive/folders/1EiifWvappJ7txvkK2fLHLn6um7SoOy7c?usp=sharing 
     """)
@@ -95,8 +95,8 @@ elif section == "Paneles solares: departamentos":
     st.markdown("""Visualiza información geográfica y distribuciones de datos bajo una segmentación regional.
                 Puedes escoger si deseas generar o cargar los datos para visualizar el gráfico, ten en cuenta que generarlo 
                 toma un poco más de tiempo.
-                \n Para las visualización regional, se tomaron datos de radiación a lo largo de un mes para todos los departamentos, 
-                y en base a la probabilidad promedio de producir una cantidad de energía diaria baja, normal o alta se categoriza
+                \n Para las visualización regional, se tomaron datos de radiación a lo largo de un año para todos los departamentos, 
+                y en base a la probabilidad de producir una cantidad de energía diaria baja, normal o alta se categoriza
                 como viable o inviable la implementación de los páneles solares.
                 """)
     with st.spinner("Procesando datos del mapa..."):
@@ -162,16 +162,16 @@ elif section == "Paneles solares: departamentos":
             st.pyplot(st.session_state["density_fig"])
     st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
     st.subheader("3. Predice tus datos")
-    st.markdown("""Si desea conocer la viabilidad basada en datos histórico para un lugar en particular,
+    st.markdown("""Si desea conocer la viabilidad basada en datos históricos para un lugar en particular,
                 tiene laposibilidad de usar este programa para montar su archivo csv.
-                \nEl archvio csv debe tener el mismo formato y datos que hay en la página:
+                \nEl archivo csv debe tener el mismo formato y datos que hay en la página:
                  https://re.jrc.ec.europa.eu/pvg_tools/en/
-                 \nSi no tiene datos, le recomendamo dirigirse a ese link, escoger el lugar de preferencia, y descargar datos
-                 históricos con reporte de hora a hora de las condiciones climáticas, una vez ingrese el archvio csv se realizará la
+                 \nSi no tiene datos, le recomendamos dirigirse a ese link, escoger el lugar de preferencia, y descargar datos
+                 históricos con reporte de hora a hora de las condiciones climáticas junto con las componentes de la radiación, una vez ingrese el archvio csv se realizará la
                  predicción de viabilidad basa en el modelo estadístico preprogramado.
                  \n Asegurese de descargar datos por horas para mayor confibilidad, puede descargar y montar datos historicos de varios años,
                  Es importante que se asegure que descarge incluyendo las componentes de la radiación y mantenga el formato correcto.
-                 \n Descarga y monta en el apartado estos datos de prueba, tomados de Antioquia de los años 2022 y 2023.
+                 \n Descarga y monta en el apartado estos datos de prueba, tomados de Antioquia de los años 20022 y 2023.
                 """)
     # Leer el archivo para asegurarte de que exista y sea accesible
     try:
@@ -227,7 +227,7 @@ elif section == "Paneles solares: Modelos Predictivos":
                     presentada en la sección de análisis regional, recordemos que el modelo analítico presentado en la otra sección, permite estimar 
                     mediante probabilidades la categoría de produción de un sistema bajo ciertas condiciones ambientales acotadas en intervalos
                     restringidos por la naturaleza de los datos, sin embargo, implementando un modelo de Machine Learning como RandomForest
-                    podemos realizar clasificaciónes que extrapolan los intervalosque antes eran una barrera.
+                    podemos realizar clasificaciones que extrapolan los intervalosque antes eran una barrera.
                     
                     \nEn esta sección puede encontrar las métricas relacionadas con el entrenamiento del modelo que permite encontrar
                     una opción viable para llevar acabo análisis estadísticos similares al análisis regional.
@@ -260,8 +260,8 @@ elif section == "Paneles solares: Modelos Predictivos":
     with tab2:
         st.subheader("2. Red Neuronal")
         st.markdown("""A parte de la posibilidad de generar modelos de predicción utilizando Machine Learning, podemos emplear 
-                    modelos de regresión que puedes brindar información muy importante para la toma de decisiones.
-                    \nEn este apartado, puede visualizar el comportamiento de una red neuronal densa (DNN) cuyo propśito es
+                    modelos de regresión que pueden brindar información muy importante para la toma de decisiones.
+                    \nEn este apartado, puede visualizar el comportamiento de una red neuronal densa (DNN) cuyo propósito es
                     ejecutar una regresión multivariada de la potencia que puede generar un array de 10 páneles solares
                     bajo ciertas condiciones ambientales.
                     \nComo se puede evidenciar en los gráficos de entrenamiento, el error cuadrádico medio de los datos predichos con los
@@ -323,7 +323,7 @@ elif section == "Paneles solares: Modelos Predictivos":
 elif section == "Resultados":
     st.header("🖼️ Sección de Imágenes")
     st.markdown("""
-    En esta sección, podrás ver algunas imágenes relacionadas con el análisis y las predicciones tanto para los paneles soalres como para
+    En esta sección, podrás ver algunas imágenes relacionadas con el análisis y las predicciones tanto para los paneles solares como para
     la energía mareomotriz.
     """)
 
@@ -343,12 +343,12 @@ elif section == "Resultados":
             rfhourlydist = rf_hourlyDis_process(data=rfhourlydata)
             fig1 = rf_hourlyDist(data=rfhourlydist)
             st.pyplot(fig1)
-            st.markdown("Distribución de producción diaria histórica en la guajira.")
+            st.markdown("Distribución de producción diaria histórica en la Guajira.")
             fig2 = dailyPower(data=rfhourlydist)
             st.pyplot(fig2)
             
             st.markdown("""
-            Potencia diaría generada en la Guajira desde 2005 para 10 paneles solares..
+            Potencia diaría generada en la Guajira desde 2005 para 10 paneles solares.
             """)
     
     with st.expander("Galería: entrenamiento de red LSTM para paneles solares"):
@@ -366,9 +366,11 @@ elif section == "Resultados":
         
         col5,col6 = st.columns(2)
         with col5:
-            st.image('./images/Tidal_energy.png',caption="Predición de red neuronal recurrente Long Short Term Memory para la potencia, resultados reales vs predicción. parala producción de energía mareomotriz en un area de 50km².", use_container_width=False)    
-            st.image('./images/aprendizajemareo.png',caption="APrendizaje de red neuronal LSTM para energía mareomotriz")
+            st.image('./images/Tidal_energy.png',caption="Predición de red neuronal recurrente Long Short Term Memory para la potencia, resultados reales vs predicción. para la producción de energía mareomotriz en un area de 50km².", use_container_width=False)    
+            st.image('./images/aprendizajemareo.png',caption="Aprendizaje de red neuronal LSTM para energía mareomotriz")
             st.image('./images/residuals.png',caption="Dispersión de residuales vs predicciones con LSTM para la energía mareomotriz", use_container_width=False)    
         with col6:
             st.image('./images/potenciamareo.png',caption="Histórico de potencia producida en la guajira para energía mareomotriz en 50km²")
             st.image('./images/powerr.png',caption="Distirbución histórica de potencia producida en la guajira para energía mareomotriz en 50km²")                        
+            
+            
